@@ -220,6 +220,11 @@ get_sensors(){
 		echo -e "\t[$REALNAME-illuminance]: \t$STATE lx"
 		set_CCU_SysVar $STATE $REALNAME-illuminance
 		;;
+	"TSL2561")
+		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.TSL2561.Illuminance'; )
+		echo -e "\t[$REALNAME-illuminance]: \t$STATE lx"
+		set_CCU_SysVar $STATE $REALNAME-illuminance
+		;;
 	"TRAFO")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Pressure'; )
 		echo -e "\t[$REALNAME-pressure]: \t$STATE hPa"
@@ -297,6 +302,7 @@ debugmsg(){
 	        Debugmsg1=$Debugmsg1"Channel: $CHANNEL\n"
 	        Debugmsg1=$Debugmsg1"Topic: $TOPIC\n"
 	        Debugmsg1=$Debugmsg1"Value: $CMND\n"
+		Debugmsg1=$Debugmsg1"Time: $Time\n"
 		Debugmsg1=$Debugmsg1"Sensor: $SENSOR\n"
 		Debugmsg1=$Debugmsg1"Sensor2: $SENSOR2\n"
 		Debugmsg1=$Debugmsg1"Realname: $REALNAME\n"
@@ -440,6 +446,10 @@ set_CCU_SysVar $IPAddress $REALNAME-ipaddr
 Signal=$(echo $StatusSTS | jq .StatusSTS | jq .Wifi | jq .Signal | sed 's/"//g')
 set_CCU_SysVar $Signal $REALNAME-RSSI
 
+Time=$(echo $StatusSNS | jq .StatusSNS.Time | sed 's/"//g')
+set_CCU_SysVar $Time $REALNAME-time
+
+
 get_ccu_var_info
 
 SENSOR=$(echo $SENSOR | tr '[a-z]' '[A-Z]')
@@ -462,6 +472,9 @@ if [ "x$SENSOR" != "x" ] ; then
 			;;
 		BH1750)
 			get_sensors BH1750
+			;;
+		TSL2561)
+			get_sensors TSL2561
 			;;
 		TRAFO)
 			get_sensors TRAFO
@@ -492,6 +505,9 @@ if [ "x$SENSOR2" != "x" ] ; then
                         ;;
 		BH1750)
 			get_sensors BH1750
+			;;
+		TSL2561)
+			get_sensors TSL2561
 			;;
                 TRAFO)
                         get_sensors TRAFO
