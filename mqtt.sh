@@ -99,35 +99,35 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 usage() {
         echo 'usage:'
-	echo "\t $(basename $0) -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor>] [--sensor2 <sensor>] [-n <number>] [-d]"
-        echo "\t $(basename $0) --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor>] [--sensor2 <sensor>] [--relaynumber <number>] [--debug]"
+	echo -e "\t $(basename $0) -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor>] [--sensor2 <sensor>] [-n <number>] [-d]"
+        echo -e "\t $(basename $0) --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor>] [--sensor2 <sensor>] [--relaynumber <number>] [--debug]"
 	echo
 	echo "OPTIONS"
-	echo "\t-c | --channel    \tCUxD channel name"
-	echo "\t-t | --topic      \tTasmota device topic name"
-	echo "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
-	echo "\t-r | --realname   \tActual name for the variable definition."
-	echo "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
-	echo "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
-	echo "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
-	echo "\t-d | --debug      \tDebug information and names for CCU systemvariables"
+	echo -e "\t-c | --channel    \tCUxD channel name"
+	echo -e "\t-t | --topic      \tTasmota device topic name"
+	echo -e "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
+	echo -e "\t-r | --realname   \tActual name for the variable definition."
+	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
+	echo -e "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
+	echo -e "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
+	echo -e "\t-d | --debug      \tDebug information and names for CCU systemvariables"
 	echo
 	echo "PREREQUISITE"
-	echo "\tRaspberrymatic and mosquitto addon"
+	echo -e "\tRaspberrymatic and mosquitto addon"
 	echo
 	echo "EXAMPLE"
-	echo "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 1"
-	echo "\t\tThis command switches on the relay of the tasmota-device."
+	echo -e "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 1"
+	echo -e "\t\tThis command switches on the relay of the tasmota-device."
 	echo
-	echo "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 0"
-	echo "\t\tThis command switches off the relay of the tasmota-device."
+	echo -e "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 0"
+	echo -e "\t\tThis command switches off the relay of the tasmota-device."
 	echo
-	echo "\t $(basename $0) -c CUX2801006:14 -t display1 -r display1 -s BME280 --sensor2 BH1750"
-	echo "\t\tThis command reads the status of the device with the topic display1 and the sensors BME280 and BH1750."
-        echo "\t\tSince the real name was changed to display1, the following variables are set in the CCU."
+	echo -e "\t $(basename $0) -c CUX2801006:14 -t display1 -r display1 -s BME280 --sensor2 BH1750"
+	echo -e "\t\tThis command reads the status of the device with the topic display1 and the sensors BME280 and BH1750."
+        echo -e "\t\tSince the real name was changed to display1, the following variables are set in the CCU."
 	echo
-	echo "\t\tdisplay1-status, display1-ipaddr, display1-RSSI, display1-temperature, display1-pressure,"
-	echo "\t\tdisplay1-seapressure, display1-humidity, display1-illuminance"
+	echo -e "\t\tdisplay1-status, display1-ipaddr, display1-RSSI, display1-temperature, display1-pressure,"
+	echo -e "\t\tdisplay1-seapressure, display1-humidity, display1-illuminance"
 	echo
 	debugmsg
         exit 0
