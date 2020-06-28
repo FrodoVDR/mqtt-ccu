@@ -1,7 +1,7 @@
 # mqtt-ccu
 Integrate Tasmota actuators into Raspberrymatic / CCU via MQTT
 
-usage:
+USAGE
 
          mqtt.sh -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor>] [--sensor2 <sensor>] [-n <number>] [-d]
          mqtt.sh --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor>] [--sensor2 <sensor>] [--relaynumber <number>] [--debug]
