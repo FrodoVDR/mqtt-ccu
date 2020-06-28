@@ -1,0 +1,14 @@
+# variables for mqtt.sh
+
+# CCU IP addr
+HOMEMATIC='127.0.0.1'
+
+# MQTT server IP addr
+MQHOST='127.0.0.1'
+
+# MQTT server port
+MQPORT=1883
+
+# MQTT options
+MQOPTION=''
+
