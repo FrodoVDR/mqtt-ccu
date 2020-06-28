@@ -107,7 +107,7 @@ usage() {
 	echo -e "\t-t | --topic      \tTasmota device topic name"
 	echo -e "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
 	echo -e "\t-r | --realname   \tActual name for the variable definition."
-	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
+	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280, TSL2561 and BH1750)"
 	echo -e "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
 	echo -e "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
 	echo -e "\t-d | --debug      \tDebug information and names for CCU systemvariables"
