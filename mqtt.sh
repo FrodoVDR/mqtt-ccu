@@ -99,14 +99,43 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 usage() {
         echo 'usage:'
-        echo "\t $(basename $0) -c CUX2801xxx:x -t TOPIC [-o value] [-n ccuname] [-s] [-d]"
+	echo "\t $(basename $0) -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor>] [--sensor2 <sensor>] [-n <number>] [-d]"
+        echo "\t $(basename $0) --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor>] [--sensor2 <sensor>] [--relaynumber <number>] [--debug]"
+	echo
+	echo "OPTIONS"
+	echo "\t-c | --channel    \tCUxD channel name"
+	echo "\t-t | --topic      \tTasmota device topic name"
+	echo "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
+	echo "\t-r | --realname   \tActual name for the variable definition."
+	echo "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
+	echo "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
+	echo "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
+	echo "\t-d | --debug      \tDebug information and names for CCU systemvariables"
+	echo
+	echo "PREREQUISITE"
+	echo "\tRaspberrymatic and mosquitto addon"
+	echo
+	echo "EXAMPLE"
+	echo "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 1"
+	echo "\t\tThis command switches on the relay of the tasmota-device."
+	echo
+	echo "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 0"
+	echo "\t\tThis command switches off the relay of the tasmota-device."
+	echo
+	echo "\t $(basename $0) -c CUX2801006:14 -t display1 -r display1 -s BME280 --sensor2 BH1750"
+	echo "\t\tThis command reads the status of the device with the topic display1 and the sensors BME280 and BH1750."
+        echo "\t\tSince the real name was changed to display1, the following variables are set in the CCU."
+	echo
+	echo "\t\tdisplay1-status, display1-ipaddr, display1-RSSI, display1-temperature, display1-pressure,"
+	echo "\t\tdisplay1-seapressure, display1-humidity, display1-illuminance"
+	echo
 	debugmsg
         exit 0
 }
 
 get_sensors(){
 	case $1 in
-	"energy")
+	"ENERGY")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS' | ${JQ} '.ENERGY' )
 		TOTAL=$(echo $STATE | ${JQ} '.Total' )
 		TOTAL_EH='kWh'
@@ -191,7 +220,7 @@ get_sensors(){
 		echo -e "\t[$REALNAME-illuminance]: \t$STATE lx"
 		set_CCU_SysVar $STATE $REALNAME-illuminance
 		;;
-	"trafo")
+	"TRAFO")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Pressure'; )
 		echo -e "\t[$REALNAME-pressure]: \t$STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-pressure
@@ -385,8 +414,10 @@ fi
 get_powerstate
 
 
-$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m ' ' )
-for status in $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 59 -C 30 -R -t stat/$TOPIC/# )
+$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 5 )
+$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 10 )
+$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 11 )
+for status in $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 59 -C 3 -R -t stat/$TOPIC/# )
 do
         # STATUS5
         if [ $(echo $status | grep StatusNET) ] ; then
@@ -411,10 +442,11 @@ set_CCU_SysVar $Signal $REALNAME-RSSI
 
 get_ccu_var_info
 
+SENSOR=$(echo $SENSOR | tr '[a-z]' '[A-Z]')
 if [ "x$SENSOR" != "x" ] ; then
 	case "$SENSOR" in
-		energy)
-			get_sensors energy
+		ENERGY)
+			get_sensors ENERGY
 			;;
 		AM2301)
 			get_sensors AM2301
@@ -431,23 +463,20 @@ if [ "x$SENSOR" != "x" ] ; then
 		BH1750)
 			get_sensors BH1750
 			;;
-		trafo)
-			get_sensors trafo
+		TRAFO)
+			get_sensors TRAFO
 			;;
 		*)	
-			get_sensors energy
-			get_sensors AM2301
-			get_sensors DS18B20
-			get_sensors BMP280
-			get_sensors BME280
+			echo "Sensor not defined"
 			;;
 	esac
 fi
 
+SENSOR2=$(echo $SENSOR2 | tr '[a-z]' '[A-Z]' )
 if [ "x$SENSOR2" != "x" ] ; then
         case "$SENSOR2" in
-                energy)
-                        get_sensors energy
+                ENERGY)
+                        get_sensors ENERGY
                         ;;
                 AM2301)
                         get_sensors AM2301
@@ -464,11 +493,11 @@ if [ "x$SENSOR2" != "x" ] ; then
 		BH1750)
 			get_sensors BH1750
 			;;
-                trafo)
-                        get_sensors trafo
+                TRAFO)
+                        get_sensors TRAFO
                         ;;
                 *)
-			# not defined
+			echo "Sensor not defined"
                         ;;
         esac
 fi
