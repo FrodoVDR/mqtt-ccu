@@ -107,7 +107,7 @@ usage() {
 	echo -e "\t-t | --topic      \tTasmota device topic name"
 	echo -e "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
 	echo -e "\t-r | --realname   \tActual name for the variable definition."
-	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280, TSL2561 and BH1750)"
+	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
 	echo -e "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
 	echo -e "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
 	echo -e "\t-d | --debug      \tDebug information and names for CCU systemvariables"
@@ -158,13 +158,13 @@ get_sensors(){
 		AMPERE_VAR='ampere'
 
 
-		echo -e "\t[${REALNAME}-${TOTAL_VAR}]:    \t$TOTAL $TOTAL_EH"
-                echo -e "\t[${REALNAME}-${YESTERDAY_VAR}]:\t$YESTERDAY $YESTERDAY_EH"
-                echo -e "\t[${REALNAME}-${TODAY_VAR}]:    \t$TODAY $TODAY_EH"
-                echo -e "\t[${REALNAME}-${POWER_VAR}]:    \t$POWER $POWER_EH"
-                echo -e "\t[${REALNAME}-${FACTOR_VAR}]:   \t$FACTOR $FACTOR_EH"
-                echo -e "\t[${REALNAME}-${VOLTAGE_VAR}]:  \t$VOLTAGE V"
-                echo -e "\t[${REALNAME}-${AMPERE_VAR}]:   \t$AMPERE A"
+		echo -e "\t[${REALNAME}-${TOTAL_VAR}]:     $TOTAL $TOTAL_EH"
+                echo -e "\t[${REALNAME}-${YESTERDAY_VAR}]: $YESTERDAY $YESTERDAY_EH"
+                echo -e "\t[${REALNAME}-${TODAY_VAR}]:     $TODAY $TODAY_EH"
+                echo -e "\t[${REALNAME}-${POWER_VAR}]:     $POWER $POWER_EH"
+                echo -e "\t[${REALNAME}-${FACTOR_VAR}]:    $FACTOR $FACTOR_EH"
+                echo -e "\t[${REALNAME}-${VOLTAGE_VAR}]:   $VOLTAGE V"
+                echo -e "\t[${REALNAME}-${AMPERE_VAR}]:    $AMPERE A"
                 set_CCU_SysVar $TOTAL $REALNAME-${TOTAL_VAR}
                 set_CCU_SysVar $YESTERDAY $REALNAME-${YESTERDAY_VAR}
                 set_CCU_SysVar $TODAY $REALNAME-${TODAY_VAR}
@@ -176,70 +176,70 @@ get_sensors(){
 		;;
 	"DS18B20")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.DS18B20.Temperature'; )
-		echo -e "\t[$REALNAME-temperature]: \t$STATE C"
+		echo -e "\t[$REALNAME-temperature]:        $STATE C"
 		set_CCU_SysVar $STATE $REALNAME-temperature
 		;;
 	"AM2301")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Temperature'; )
-		echo -e "\t[$REALNAME-temperature]: \t$STATE C"
+		echo -e "\t[$REALNAME-temperature]:        $STATE C"
 		set_CCU_SysVar $STATE $REALNAME-temperature
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Humidity'; )
-		echo -e "\t[$REALNAME-humidity]: \t$STATE %"
+		echo -e "\t[$REALNAME-humidity]:           $STATE %"
 		set_CCU_SysVar $STATE $REALNAME-humidity
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.DewPoint'; )
-		echo -e "\t[$REALNAME-dewpoint]: \t$STATE C"
+		echo -e "\t[$REALNAME-dewpoint]:           $STATE C"
 		set_CCU_SysVar $STATE $REALNAME-dewpoint
 		;;
 	"BMP280")
 	        STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Temperature'; )
-                echo -e "\t[$REALNAME-temperature]: \t$STATE C"
+                echo -e "\t[$REALNAME-temperature]:        $STATE C"
 		set_CCU_SysVar $STATE $REALNAME-temperature
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Pressure'; )
-		echo -e "\t[$REALNAME-pressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-pressure]:           $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-pressure
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.SeaPressure'; )
-		echo -e "\t[$REALNAME-seapressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-seapressure]:        $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-seapressure
 		;;
 	"BME280")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BME280.Temperature'; )
-		echo -e "\t[$REALNAME-temperature]: \t$STATE C"
+		echo -e "\t[$REALNAME-temperature]:        $STATE C"
 		set_CCU_SysVar $STATE $REALNAME-temperature
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BME280.Pressure'; )
-		echo -e "\t[$REALNAME-pressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-pressure]:           $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-pressure
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BME280.SeaPressure'; )
-		echo -e "\t[$REALNAME-seapressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-seapressure]:        $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-seapressure
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BME280.Humidity'; )
-		echo -e "\t[$REALNAME-humidity]: \t$STATE %"
+		echo -e "\t[$REALNAME-humidity]:           $STATE %"
 		set_CCU_SysVar $STATE $REALNAME-humidity
 		;;
 	"BH1750")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BH1750.Illuminance'; )
-		echo -e "\t[$REALNAME-illuminance]: \t$STATE lx"
+		echo -e "\t[$REALNAME-illuminance]:        $STATE lx"
 		set_CCU_SysVar $STATE $REALNAME-illuminance
 		;;
 	"TSL2561")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.TSL2561.Illuminance'; )
-		echo -e "\t[$REALNAME-illuminance]: \t$STATE lx"
+		echo -e "\t[$REALNAME-illuminance]:        $STATE lx"
 		set_CCU_SysVar $STATE $REALNAME-illuminance
 		;;
 	"TRAFO")
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Pressure'; )
-		echo -e "\t[$REALNAME-pressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-pressure]:           $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-pressure
 		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.SeaPressure'; )
-		echo -e "\t[$REALNAME-seapressure]: \t$STATE hPa"
+		echo -e "\t[$REALNAME-seapressure]:        $STATE hPa"
 		set_CCU_SysVar $STATE $REALNAME-seapressure
                 STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Temperature'; )
-                echo -e "\t[$REALNAME-temperature]: \t$STATE C"
+                echo -e "\t[$REALNAME-temperature]:        $STATE C"
                 set_CCU_SysVar $STATE $REALNAME-temperature
                 STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Humidity'; )
-                echo -e "\t[$REALNAME-humidity]: \t$STATE %"
+                echo -e "\t[$REALNAME-humidity]:           $STATE %"
                 set_CCU_SysVar $STATE $REALNAME-humidity
                 STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.DewPoint'; )
-                echo -e "\t[$REALNAME-dewpoint]: \t$STATE C"
+                echo -e "\t[$REALNAME-dewpoint]:           $STATE C"
                 set_CCU_SysVar $STATE $REALNAME-dewpoint
 		;;
 	*)
@@ -299,19 +299,19 @@ set_CUxD_state(){
 debugmsg(){
 	if [ $DEBUG -eq 1 ] ; then
 		Debugmsg1=$Debugmsg1"\n-----------------------------------------------------------------------------------------------------\n\n"
-	        Debugmsg1=$Debugmsg1"Channel: $CHANNEL\n"
-	        Debugmsg1=$Debugmsg1"Topic: $TOPIC\n"
-	        Debugmsg1=$Debugmsg1"Value: $CMND\n"
-		Debugmsg1=$Debugmsg1"Time: $Time\n"
-		Debugmsg1=$Debugmsg1"Sensor: $SENSOR\n"
-		Debugmsg1=$Debugmsg1"Sensor2: $SENSOR2\n"
-		Debugmsg1=$Debugmsg1"Realname: $REALNAME\n"
+	        Debugmsg1=$Debugmsg1"Channel:     $CHANNEL\n"
+	        Debugmsg1=$Debugmsg1"Topic:       $TOPIC\n"
+	        Debugmsg1=$Debugmsg1"Value:       $CMND\n"
+		Debugmsg1=$Debugmsg1"Time:        $Time\n"
+		Debugmsg1=$Debugmsg1"Sensor:      $SENSOR\n"
+		Debugmsg1=$Debugmsg1"Sensor2:     $SENSOR2\n"
+		Debugmsg1=$Debugmsg1"Realname:    $REALNAME\n"
 		Debugmsg1=$Debugmsg1"RelayNumber: $RELNR\n"
-		Debugmsg1=$Debugmsg1"PowerSub: $POWERSUB\n"
-		Debugmsg1=$Debugmsg1"Power: $STATUS\n"
-		Debugmsg1=$Debugmsg1"StatusNET: $StatusNET\n"
-		Debugmsg1=$Debugmsg1"StatusSNS: $StatusSNS\n"
-		Debugmsg1=$Debugmsg1"StatusSTS: $StatusSTS\n"
+		Debugmsg1=$Debugmsg1"PowerSub:    $POWERSUB\n"
+		Debugmsg1=$Debugmsg1"Power:       $STATUS\n"
+		Debugmsg1=$Debugmsg1"StatusNET:\n$StatusNET\n"
+		Debugmsg1=$Debugmsg1"StatusSNS:\n$StatusSNS\n"
+		Debugmsg1=$Debugmsg1"StatusSTS:\n$StatusSTS\n"
 	        echo -e "\n\n"
 	        echo -e "-----------------------------------------------------------------------------------------------------"
 	        echo -e "                                       Debug Ausgaben"
@@ -325,10 +325,10 @@ get_ccu_var_info(){
 	echo -e "                                       CCU Systemvariablen"
 	echo -e "-----------------------------------------------------------------------------------------------------"
 	echo
-	echo -e "\t[$REALNAME-status]:    \t$AVAILABLE"
-        echo -e "\t[$REALNAME-ipaddr]:    \t${IPAddress}"
-	echo -e "\t[$REALNAME-RSSI]:      \t${Signal}"
-	echo
+	echo -e "\t[$REALNAME-status]:             $AVAILABLE"
+        echo -e "\t[$REALNAME-ipaddr]:             ${IPAddress}"
+	echo -e "\t[$REALNAME-RSSI]:               ${Signal}"
+	echo -e "\t[$REALNAME-Time]:               ${Time}"
 }
 
 OPT=`${GETOPT} -o h:c:t:o:s:n:r:d --long help,channel:,topic:,value:,sensor:,sensor2:,relaynumber:,realname:,debug -- "$@"`
@@ -421,23 +421,13 @@ get_powerstate
 
 
 $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 5 )
+StatusNET=$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 5 -C 1 -R -t stat/$TOPIC/STATUS5 )
+
 $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 10 )
+StatusSNS=$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 5 -C 1 -R -t stat/$TOPIC/STATUS10 )
+
 $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $PUB -h $MQHOST -p $MQPORT $MQOPTION -t cmnd/$TOPIC/status -m 11 )
-for status in $( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 59 -C 3 -R -t stat/$TOPIC/# )
-do
-        # STATUS5
-        if [ $(echo $status | grep StatusNET) ] ; then
-		StatusNET=$status
-	fi
-        # STATUS10
-        if [ $(echo $status | grep StatusSNS) ] ; then
-		StatusSNS=$status
-        fi
-	# STATUS11
-	if [ $(echo $status | grep StatusSTS) ] ; then
-		StatusSTS=$status
-	fi
-done
+StatusSTS=$( LD_LIBRARY_PATH=$ADDON_DIR/lib && $SUB -h $MQHOST -p $MQPORT $MQOPTION -W 5 -C 1 -R -t stat/$TOPIC/STATUS11 )
 
 
 IPAddress=$(echo $StatusNET | jq .StatusNET | jq .IPAddress | sed 's/"//g')
