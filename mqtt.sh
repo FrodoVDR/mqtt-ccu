@@ -18,6 +18,7 @@ fi
 DEBUG=0
 SENSOR=''
 SENSOR2=''
+SENSOR3=''
 CHANNEL=''
 TOPIC=''
 ONLINE=''
@@ -27,6 +28,7 @@ PUB="$ADDON_DIR/bin/mosquitto_pub"
 CURL_timout='-m 5'
 StatusNET=''
 StatusSNS=''
+StatusSTS=''
 RELNR=''
 
 
@@ -99,16 +101,17 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 usage() {
         echo 'usage:'
-	echo -e "\t $(basename $0) -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor>] [--sensor2 <sensor>] [-n <number>] [-d]"
-        echo -e "\t $(basename $0) --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor>] [--sensor2 <sensor>] [--relaynumber <number>] [--debug]"
+	echo -e "\t $(basename $0) -c <CUX2801xxx:x> -t <TOPIC> [-o <value>] [-r <ccuname>] [-s <sensor1,sensor2,...>] [-n <number>] [-d]"
+        echo -e "\t $(basename $0) --channel <CUX2801xxx:x> --topic <TOPIC> [--value <value>] [--realname <ccuname>] [--sensor <sensor1,sensor2,...>] [--relaynumber <number>] [--debug]"
 	echo
 	echo "OPTIONS"
 	echo -e "\t-c | --channel    \tCUxD channel name"
 	echo -e "\t-t | --topic      \tTasmota device topic name"
 	echo -e "\t-o | --value      \tPower cmnd [0 - off, 1 - on, 2 - toggle]"
 	echo -e "\t-r | --realname   \tActual name for the variable definition."
-	echo -e "\t-s | --sensor     \tQuery of sensor data (ENERGY, DS18B20, AM2301, BMP280, BME280 and BH1750"
-	echo -e "\t     --sensor2    \tIf the sensor data (e.g. temperature) are the same, only the one from sensor2 is displayed."
+	echo -e "\t-s | --sensor     \tQuery of sensor data,"
+        echo -e "\t                  \tYou can pass a list of sensors separated by commas."
+	echo -e "\t                  \t(ENERGY, DS18B20, AM2301, BMP280, BME280, TSL2561 and BH1750)"
 	echo -e "\t-n | --relaynumber\tFor devices with mor than one relay you can give the relay number."
 	echo -e "\t-d | --debug      \tDebug information and names for CCU systemvariables"
 	echo
@@ -225,24 +228,44 @@ get_sensors(){
 		echo -e "\t[$REALNAME-illuminance]:        $STATE lx"
 		set_CCU_SysVar $STATE $REALNAME-illuminance
 		;;
-	"TRAFO")
-		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.Pressure'; )
-		echo -e "\t[$REALNAME-pressure]:           $STATE hPa"
-		set_CCU_SysVar $STATE $REALNAME-pressure
-		STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.BMP280.SeaPressure'; )
-		echo -e "\t[$REALNAME-seapressure]:        $STATE hPa"
-		set_CCU_SysVar $STATE $REALNAME-seapressure
-                STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Temperature'; )
-                echo -e "\t[$REALNAME-temperature]:        $STATE C"
-                set_CCU_SysVar $STATE $REALNAME-temperature
-                STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.Humidity'; )
-                echo -e "\t[$REALNAME-humidity]:           $STATE %"
-                set_CCU_SysVar $STATE $REALNAME-humidity
-                STATE=$( echo $StatusSNS | ${JQ} '.StatusSNS.AM2301.DewPoint'; )
-                echo -e "\t[$REALNAME-dewpoint]:           $STATE C"
-                set_CCU_SysVar $STATE $REALNAME-dewpoint
-		;;
 	*)
+		echo "Warning: $1 not defined"
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.Pressure"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-pressure]:           $STATE hPa"
+			set_CCU_SysVar $STATE $REALNAME-$1-pressure
+			STATE=
+		fi
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.SeaPressure"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-seapressure]:        $STATE hPa"
+			set_CCU_SysVar $STATE $REALNAME-$1-seapressure
+			STATE=
+		fi
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.Temperature"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-temperature]:        $STATE C"
+			set_CCU_SysVar $STATE $REALNAME-$1-temperature
+			STATE=
+		fi
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.Humidity"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-humidity]:           $STATE %"
+			set_CCU_SysVar $STATE $REALNAME-$1-humidity
+			STATE=
+		fi
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.DewPoint"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-dewpoint]:           $STATE C"
+			set_CCU_SysVar $STATE $REALNAME-$1-dewpoint
+			STATE=
+		fi
+		STATE=$( echo $StatusSNS | ${JQ} ".StatusSNS.$1.Illuminance"; )
+		if [ $STATE != 'null' ] ; then
+			echo -e "\t[$REALNAME-$1-illuminance]:        $STATE lx"
+			set_CCU_SysVar $STATE $REALNAME-$1-illuminance
+			STATE=
+		fi
 		# not defined
 		;;
 	esac
@@ -303,8 +326,6 @@ debugmsg(){
 	        Debugmsg1=$Debugmsg1"Topic:       $TOPIC\n"
 	        Debugmsg1=$Debugmsg1"Value:       $CMND\n"
 		Debugmsg1=$Debugmsg1"Time:        $Time\n"
-		Debugmsg1=$Debugmsg1"Sensor:      $SENSOR\n"
-		Debugmsg1=$Debugmsg1"Sensor2:     $SENSOR2\n"
 		Debugmsg1=$Debugmsg1"Realname:    $REALNAME\n"
 		Debugmsg1=$Debugmsg1"RelayNumber: $RELNR\n"
 		Debugmsg1=$Debugmsg1"PowerSub:    $POWERSUB\n"
@@ -331,7 +352,7 @@ get_ccu_var_info(){
 	echo -e "\t[$REALNAME-Time]:               ${Time}"
 }
 
-OPT=`${GETOPT} -o h:c:t:o:s:n:r:d --long help,channel:,topic:,value:,sensor:,sensor2:,relaynumber:,realname:,debug -- "$@"`
+OPT=`${GETOPT} -o h:c:t:o:s:n:r:d --long help,channel:,topic:,value:,sensor:,relaynumber:,realname:,debug -- "$@"`
 eval set -- "$OPT"
 while true; do
     case "$1" in
@@ -355,10 +376,6 @@ while true; do
 	SENSOR=$2
 	shift 2
 	;;
-    --sensor2)
-        SENSOR2=$2
-        shift 2
-        ;;
     -n|--relaynumber)
 	RELNR=$2
 	shift 2
@@ -407,6 +424,7 @@ else
 fi
 set_CCU_SysVar $AVAILABLE $REALNAME-status
 if [ $AVAILABLE -eq 0 ] ; then
+	set_CCU_SysVar -100 $REALNAME-RSSI
 	logger -i -t $0 -p 3 "Warning: $TOPIC Offline" >> /dev/null 2>&1
 	exit 1
 fi
@@ -442,70 +460,19 @@ set_CCU_SysVar $Time $REALNAME-time
 
 get_ccu_var_info
 
-SENSOR=$(echo $SENSOR | tr '[a-z]' '[A-Z]')
 if [ "x$SENSOR" != "x" ] ; then
-	case "$SENSOR" in
-		ENERGY)
-			get_sensors ENERGY
-			;;
-		AM2301)
-			get_sensors AM2301
-			;;
-		DS18B20)
-			get_sensors DS18B20
-			;;
-		BMP280)
-			get_sensors BMP280
-			;;
-		BME280)
-			get_sensors BME280
-			;;
-		BH1750)
-			get_sensors BH1750
-			;;
-		TSL2561)
-			get_sensors TSL2561
-			;;
-		TRAFO)
-			get_sensors TRAFO
-			;;
-		*)	
-			echo "Sensor not defined"
-			;;
-	esac
-fi
-
-SENSOR2=$(echo $SENSOR2 | tr '[a-z]' '[A-Z]' )
-if [ "x$SENSOR2" != "x" ] ; then
-        case "$SENSOR2" in
-                ENERGY)
-                        get_sensors ENERGY
-                        ;;
-                AM2301)
-                        get_sensors AM2301
-                        ;;
-                DS18B20)
-                        get_sensors DS18B20
-                        ;;
-                BMP280)
-                        get_sensors BMP280
-                        ;;
-                BME280)
-                        get_sensors BME280
-                        ;;
-		BH1750)
-			get_sensors BH1750
-			;;
-		TSL2561)
-			get_sensors TSL2561
-			;;
-                TRAFO)
-                        get_sensors TRAFO
-                        ;;
-                *)
-			echo "Sensor not defined"
-                        ;;
-        esac
+	i=1
+	OLDIFS=$IFS
+	IFS=,
+	for value in $SENSOR
+	do
+		value=$(echo $value | tr '[a-z]' '[A-Z]')
+		echo "Sensor$i: $value"
+		IFS=$OLDIFS
+		get_sensors $value
+		i=$((i+1))
+	done
+	IFS=$OLDIFS
 fi
 
 debugmsg
