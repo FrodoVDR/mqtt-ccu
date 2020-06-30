@@ -125,7 +125,7 @@ usage() {
 	echo -e "\t $(basename $0) -c CUX2801006:1 -t tasmota-device -o 0"
 	echo -e "\t\tThis command switches off the relay of the tasmota-device."
 	echo
-	echo -e "\t $(basename $0) -c CUX2801006:14 -t display1 -r display1 -s BME280 --sensor2 BH1750"
+	echo -e "\t $(basename $0) -c CUX2801006:14 -t display1 -r display1 -s BME280,BH1750"
 	echo -e "\t\tThis command reads the status of the device with the topic display1 and the sensors BME280 and BH1750."
         echo -e "\t\tSince the real name was changed to display1, the following variables are set in the CCU."
 	echo
